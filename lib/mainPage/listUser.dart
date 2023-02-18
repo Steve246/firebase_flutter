@@ -22,12 +22,14 @@ class _ListUserState extends State<ListUser> {
             return Text("Something when wrong! $snapshot");
           } else if (snapshot.hasData) {
             final users = snapshot.data!;
+            print("BERHASIL GET DATA FIREBASE");
+            print(users.asMap());
 
             return ListView(
               children: users.map(buildUser).toList(),
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -43,44 +45,86 @@ class _ListUserState extends State<ListUser> {
   }
 
   Stream<List<User>> readUsers() => FirebaseFirestore.instance
-      .collection("users")
+      .collection("narindo")
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => User.fromJson(doc.data())).toList());
-  // snapshot.docs.map((doc) => User.toJson(doc.data())).toList());
 
-  Widget buildUser(User user) => ListTile(
-        leading: CircleAvatar(
-          child: Text("${user.age}"),
+  Widget buildUser(User user) => Container(
+        width: 328,
+        // height: 135,
+        margin: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
-        title: Text(user.name),
-        subtitle: Text(user.birthday.toIso8601String()),
+        child: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                leading: CircleAvatar(
+                  child: Text("${user.description}"),
+                ),
+                title: Text(user.msisdn),
+                subtitle: Text(user.time.toIso8601String()),
+              ),
+              ListTile(
+                leading: CircleAvatar(
+                  child: Text("${user.success}"),
+                ),
+                title: Text(user.title),
+                subtitle: Text(user.type),
+              ),
+            ],
+          ),
+        ),
       );
 }
 
 class User {
   String id;
-  final String name;
-  final int age;
-  final DateTime birthday;
+  final String description;
+  final String msisdn;
+  final String success;
+  final DateTime time;
+  final String title;
+  final String type;
 
-  User({
-    this.id = "",
-    required this.name,
-    required this.age,
-    required this.birthday,
-  });
+  // User({
+  //   this.id = "",
+  //   required this.name,
+  //   required this.age,
+  //   required this.birthday,
+  // });
+
+  User(
+      {this.id = "",
+      required this.description,
+      required this.msisdn,
+      required this.success,
+      required this.time,
+      required this.title,
+      required this.type});
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "age": age,
-        "birthday": birthday,
+        "description": description,
+        "msisdn": msisdn,
+        "success": success,
+        "time": time,
+        "title": title,
+        "type": type
       };
+
   static User fromJson(Map<String, dynamic> json) => User(
-        id: json['id'],
-        name: json['name'],
-        age: json['age'],
-        birthday: (json["birthday"] as Timestamp).toDate(),
+        description: json['description'],
+        msisdn: json['msisdn'],
+        success: json['success'],
+        time: (json["time"] as Timestamp).toDate(),
+        title: json['title'],
+        type: json['type'],
       );
 }
